@@ -1,1 +1,150 @@
+第一天刷leetcode,
+练习了五道题
+******************************
+1.删除排序数组中的重复项
+给你一个 升序排列 的数组 nums ，请你 原地 删除重复出现的元素，使每个元素 只出现一次 ，返回删除后数组的新长度。
+元素的 相对顺序 应该保持 一致 。
 
+此题一开始我想的是把数组内容复制到一个新的比较数组，在与原数组依次比较，删除重复的元素，但是暂时没有写出代码，所以看了看答案，
+大佬们都是用双指针来做的: 定义两个int类型，一个fast遍历原数组的元素，一个slow负责复制元素到新数组:
+
+*******************双指针**********************
+int removeDuplicates(int* nums, int numsSize){
+    int fast=1,slow=1;
+    while (fast<numsSize){
+        if (nums[fast]!=nums[fast-1]){
+            nums[slow]=nums[fast];  //如果快指针遍历的元素不等于前面的元素，则可以把元素添加到慢指针控制的数组，慢指针单独递增
+            slow++;
+        }
+        fast++;
+    }
+    return slow;
+}
+//注意此题要求你返回去重后的数组的元素个数，同时数组本身也被修改
+
+//第二道题: 计算买股票的最佳时机
+其实没这么复杂，答案说要动态规划啥的，我还没学，所以我采用了暴力解法:只要两天的数字之差是整数，则就是利润，相加即可
+fmax(0,xxx) 返回两个浮点数的最大值
+
+int maxProfit(int* prices, int pricesSize){
+    int sum=0;
+    for (int i=1;i<pricesSize;i++){
+        sum+=fmax(0,prices[i]-prices[i-1]); //返回两个数相减与0的最大值
+    }
+    return sum;
+}
+一定要注意数组越界的问题，这个问题吃了不少亏了
+此题还可用动态规划来做，等以后再说
+
+第三题: 旋转数组:
+其实本质上就是一个找规律的问题
+
+输入: nums = [1,2,3,4,5,6,7], k = 3
+输出: [5,6,7,1,2,3,4]
+解释:
+向右轮转 1 步: [7,1,2,3,4,5,6]
+向右轮转 2 步: [6,7,1,2,3,4,5]
+向右轮转 3 步: [5,6,7,1,2,3,4]
+
+由此可见，nums在旋转k次后，找规律可得到结论: 旋转后的 (i+k)%SIZE 下标的值就是就是原数组i位置的值，
+比如 : 第一次旋转: nums[0]=1;  旋转k=3次后 : index=(0+3)%7(数组的长度)   nums[3]=nums[0]
+
+void rotate(int* nums, int numsSize, int k){
+//这个地方我还用了动态分配内存，因为在有的编译器上不支持C99变长数组,如 VS
+    int* dest=(int*) malloc(numsSize*sizeof(int));
+    if (dest==NULL){
+        exit(3);
+    }
+    for (int i=0;i<numsSize;i++){
+        dest[(i+k)%numsSize]=nums[i];  //代码其实就一行
+    }
+    memcpy(nums,dest,numsSize*sizeof(int));
+    free(dest);
+    dest=NULL;
+}
+要善于找规律 
+
+第四题: 反转字符串 
+输入：s = ["h","e","l","l","o"]
+输出：["o","l","l","e","h"]  
+//必须原地修改，不能定义一个新的数组
+
+//这个题其实很简单
+void reverseString(char* s, int sSize){
+    char ch;
+    for (int i=0;i<sSize/2;i++){
+        ch=s[i];        
+        s[i]=s[sSize-i-1];
+        s[sSize-i-1]=ch;
+        //类似于两个数字的交换，用ch交换即可
+    }
+}
+
+//这两个其实原理上是一样的，利用双指针，一个指向开头，一个指向末尾，其实是一个道理
+void reverseString(char* s, int sSize){
+    char temp;
+    int first=0,last=sSize-1;
+    while (first<last){
+        temp=s[first];
+        s[first]=s[last];
+        s[last]=temp;
+        first++;
+        last--;
+    }
+}
+
+//第五个题: 反转数字
+321->123   -12345->-54321   大于2的31次方-1的数字结果为0
+这个题目真的困扰了我好久，其实本质上很简单，求出每位数字的余数，乘10相加即可，但是我一开始没想到，弄得很复杂，但是最后也能算对
+我写得: 
+#include <math.h>
+int reverse(int x){
+    int res,k=0,index=0;
+    
+    long sum=0;   //这地方是个坑，在leetcode上我不知道编译器long类型范围是多少，但是在 VS2022 上，使用long类型做这个题会出错，
+                  //题目要求超过2的31次方后 归 0，  但是在VS上不会清零，可能 VS上的long大于2的31次方
+    int num[32];
+    while (x){
+        res=x%10;
+        num[index++]=res;
+        k+=1;           //这里我还弄了一个k，等会还用到pow求，其实是多余得
+        x/=10;
+    }
+    for (int i=0;i<index;i++){
+        //index= 2 1 0
+        sum+=num[i]*pow(10,k-i-1);    //这个地方，多此一举
+    }
+    if (sum>pow(2,31)-1 || sum<pow(-2,31))
+        return 0;
+    return sum;
+}
+
+//修改后的: 
+#include <math.h>
+int reverse(int x){
+    int n;
+	long sum = 0;
+	if (x > pow(2, 31) - 1 || x < pow(-2, 31))
+		return 0;   //判断原数字是否越界
+	while (x) {
+		n = x % 10;
+    
+		sum = sum * 10 + n;     //其实就是这一行代码  简单来书: 321->  1   1*10+2    12   12*10+3  123  这样互换   
+                            //其实和我上面写的sum+=num[i]*pow(10,k-i-1)是一个道理,321 ->  1*100 + 2*10 + 3*1   123
+		if (sum > pow(2, 31) - 1 || sum < pow(-2, 31))
+			return 0;   //判断每个数字是否越界
+		x /= 10;
+	}
+
+	return sum;
+}
+
+
+最后还有一个困扰我很久的的问题
+还有一个题目：  判断是否存在重复的元素 数组中，如果有 true 否则false
+这个题目原理其实很简单， 只需将数组排序即可，因为排好顺序后，相邻的两个元素如果相等， 则就是true 
+所有只需判断  nums[j]!=nums[j+1] 即可  但是我现在只掌握了冒泡  选择  插入排序 ，  这三种排序都会造成时间复杂度过大
+等以后在来解决这个问题吧! 
+题目链接
+https://leetcode-cn.com/leetbook/read/top-interview-questions-easy/x248f5/
+ 
