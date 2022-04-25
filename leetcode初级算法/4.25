@@ -1,0 +1,175 @@
+今天作业比较多，只做了两道题，另外还有几道课本上的题目
+
+初级算法 :
+题目一: 找出只存在一次的元素
+给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+【2，1，1】->2   [1,2,1,2,5]->5
+
+这道题其实很简单，一开始想到了创建两个数组，比较，如果有相同的元素，标记为1，最后标记为0的就是要找的元素
+但是实际操作出乎我的想象，做不出来，看来答案才知道这道题归根究底还是排序的一道题，因为你只要给这个数组排序，
+在定义一个变量temp指向nums[0]，通过temp移动和nums数组移动，只要两个表达式不相同，就把nums里面的元素赋值给temp
+int singleNumber(int* nums, int numsSize){
+    int temp;
+    for (int i=0;i<numsSize-1;i++){
+        for (int j=0;j<numsSize-i-1;j++){
+            if (nums[j]>nums[j+1]){
+                temp=nums[j];
+                nums[j]=nums[j+1];
+                nums[j+1]=temp;
+            }
+        }
+    }
+    //如果数组已经排序好了，那么相邻的两个元素应该相同，如果不相同，则那个数字就是我们要找的数字
+    //已经排序好了
+    int n=nums[0];  //记录结果
+    // 1 2 2 3 3 4 4 5 5  ，结果是1  
+    for (int i=1;i<numsSize;i++){
+        if (n!=nums[i]){
+            //n=nums[i];
+            break;
+        }
+        i++;
+        n=nums[i];
+    }
+    return n;
+}
+另外还有另一种牛逼的做法，就是采用位运算 ； 异或运算
+int singleNumber(int* nums, int numsSize){
+    int n=0;
+    for (int i=0;i<numsSize;i++){
+        n=n^nums[i];    //核心代码，暂时还不太懂，等以后再来解读吧
+    }
+    return n;
+}
+
+第二题: 返回两个数组的交集
+唯一想到的解法也是先给两个数组排序，在定义一个第三方数组，利用双指针，一个指针引领第一个数组，一个指针引领第二个数组，
+  例如[0,1,1,2,5,3]  [0,5,6,3,2,8]
+ /**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+int* intersect(int* nums1, int nums1Size, int* nums2, int nums2Size, int* returnSize){
+    *returnSize=0;
+    int* nums3=(int*) malloc(sizeof(int)*fmin(nums1Size,nums2Size));
+    int temp;
+    for (int i=0;i<nums1Size-1;i++){
+        for (int j=0;j<nums1Size-i-1;j++){
+            if (nums1[j]>nums1[j+1]){
+                temp=nums1[j];
+                nums1[j]=nums1[j+1];
+                nums1[j+1]=temp;
+            }
+        }
+    }
+    for (int i=0;i<nums2Size-1;i++){
+        for (int j=0;j<nums2Size-i-1;j++){
+            if (nums2[j]>nums2[j+1]){
+                temp=nums2[j];
+                nums2[j]=nums2[j+1];
+                nums2[j+1]=temp;
+            }
+        }
+    }
+    //排序已完成
+    //将两个数组排序好后，
+    //例如: [0,1,1,2,3,4,5]  [2,3,5,9,10];
+    //可以得到规律: 当nums1元素小于num2的元素时，index1++；相反，直到两个数组的元素相同时停止，此时添加元素到第三个数组
+    int index1=0,index2=0;
+    while (index1<nums1Size && index2<nums2Size){
+        if (nums1[index1]<nums2[index2])
+            index1++;
+        else if (nums1[index1]>nums2[index2]){
+            index2++;
+        }
+        else{  
+            nums3[(*returnSize)++]=nums1[index1];   //添加相同的元素，nums1和nums2都可以，注意(*returnSIZE)++的变化
+            index1++;
+            index2++;
+        }
+    }
+    return nums3;
+}
+
+同时还做了课本上的两道题:
+杨辉三角: 
+int main(void) {
+	int num[10][10] = { 0 };  //必须初始化数组元素是0，因为会用到很多个1，初始化代表赋值为0，如果不是初始化，则为随机值，值就不是1
+
+  //因为第一列永远是1，所以第一列直接初始化为1；
+	for (int i = 0; i < 10; i++) {
+		num[i][0] = 1;  
+	}
+  //接下来添加元素，每个元素是它 同列上一行的元素 + 上一列上一行的元素  之和
+	for (int i = 1; i <= 10; i++) {
+		for (int j = 1; j <= i; j++) {
+			num[i][j] = num[i - 1][j] + num[i - 1][j - 1];
+		}
+	}
+  //打印图形
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j <= i; j++) {
+			printf("%d ", num[i][j]);
+		}
+		printf("\n");
+	}
+	return 0;
+}
+
+鞍点:一行中最大的元素，同时又是一列中最小的元素 
+思路 : 找出一行最大值对应的 列数 ，传递给寻找最小值的循环，找到最小的元素对应的 行号，同时比较两个元素，
+如果两个元素相等，并且找到的 行号等于总循环的行号 ，输出鞍点
+
+#define ROW 4
+#define COL 5
+int main(void) {
+	int num[ROW][COL];
+	printf("请输入 %d*%d 矩阵:\n",ROW,COL);
+	for (int i = 0; i < ROW; i++) {
+		for (int j = 0; j < COL; j++)
+			scanf("%d", &num[i][j]);
+	}
+	int row=0, col=0, max=0, min=0, fg = 0;   //一定要初始化，不然会出问题
+ 
+//总循环，遍历行
+for (int i = 0; i < ROW; i++) {
+		//找出一行中的最大列那一项，行不变
+		max = num[i][0];
+		for (int j = 0; j < COL; j++) {
+			//列查找
+			if (max < num[i][j]) {
+				max = num[i][j];
+				col = j;	//找出那一列
+			}
+		}
+		//把列号传递给下一循环，//列不变
+		min = num[0][col];  
+		for (int j = 0; j < ROW; j++) {
+			//行查找
+			if (min > num[j][col]) {
+				min = num[j][col];
+				row = j;
+			}
+		}
+		if (max == min && row == i) {
+			fg = 1;
+			printf("鞍点: %d行 %d列 : %d\n", row, col, max);
+			break;
+		}
+	}
+	if (fg == 0)
+		printf("没有鞍点\n");
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
