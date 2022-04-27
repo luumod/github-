@@ -1,0 +1,50 @@
+两道题
+
+两数之和
+给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
+
+[8,9]->17 [0,1]   [1,2,5]->7  [0,1]
+最简单的办法，依次遍历每个数组的元素，从数组第一个元素开始，直接两个元素相加之和相等则停止
+
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+int* twoSum(int* nums, int numsSize, int target, int* returnSize){
+    for(int i=0;i<numsSize;i++){
+        for (int j=i+1;j<numsSize;j++){
+            if (nums[i]+nums[j]==target){
+                int* ar=(int*) malloc(sizeof(int)*2);
+                ar[0]=i;
+                ar[1]=j;
+                *returnSize=2;
+                return ar;
+            }
+        }
+    }
+    *returnSize=0;
+    return NULL;
+}
+
+旋转图像
+
+将一个图像顺时针旋转90度
+
+输入：matrix =
+[[1,2,3],       [[7,4,1],
+[4,5,6],  ->    [8,5,2],
+[7,8,9]]        [9,6,3]]
+由图像规律可得:  第一个图像的某位置 i,j   对应旋转后的指定元素位置是 j,numsSize-i-1
+可以先创建一个临时数组存储旋转后的图像位置，然后再复制到原数组
+
+void rotate(int** matrix, int matrixSize, int* matrixColSize){
+    int ar[matrixSize][matrixSize];
+    for (int i=0;i<matrixSize;i++){
+        for (int j=0;j<matrixSize;j++){
+            ar[j][matrixSize-i-1]=matrix[i][j];
+        }
+    }
+    for (int i=0;i<matrixSize;i++){     //数组元素每行复制
+        memcpy(matrix[i],ar[i],sizeof(int)*matrixSize);
+    }
+    return matrix;
+}
