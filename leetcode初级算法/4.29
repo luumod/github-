@@ -1,0 +1,80 @@
+今天写了两道题,最近主要是研究链表了
+其中一道:
+
+找出唯一的一个字符的位置:  给定一个字符串 s ，找到 它的第一个不重复的字符，并返回它的索引 。如果不存在，则返回 -1 。
+
+输入: s = "leetcode"
+输出: 0
+
+输入: s = "loveleetcode"
+输出: 2
+
+思路: 依次遍历两个字符串，先求出len长度，利用for循环遍历字符串的每个字符，两个字符两个字符的比较，
+如果两个字符相等，略过，如果两个字符不相等，则设置标志变量递增，直到结束里层循环
+注意:  不能找到一个字符后就break，然后就退出，要考虑 "aabb" 的情况，因为到第二个a时，a!=b，但是a不是唯一一个
+因此要从头开始比较两个元素，利用一个标志来确定位置
+
+int firstUniqChar(char * s){
+    int len=strlen(s);
+    int count=0;
+    for (int i=0;i<len;i++){
+        count=0;
+        for (int j=0;j<len;j++){
+            if (s[i]==s[j]){
+                if (i==j)
+                ;         //不能break
+                else{
+                    count++;  //标志递增
+                    break;
+                }
+            }
+        }
+        if (count==0){
+            return i;
+        }   
+    }
+    return -1;
+}
+
+
+第二题:  判断字母是否是异位词
+注意：若 s 和 t 中每个字符出现的次数都相同，则称 s 和 t 互为字母异位词。
+输入: s = "anagram", t = "nagaram"
+输出: true
+ 
+思路:字符串是可以排序的，只需要将两个字符串排序，从小到大: aabbccdd 即利用strcmp比较两个字符串是否相等即可
+排序算法:  
+
+冒泡排序: 
+for (int i=0;i<SIZE-1;i++){
+  for (int j=0;j<SIZE-i-1;j++){
+    if (nums[j]<nums[j+1]){
+      temp=nums[j];
+      nums[j]=nums[j+1];
+      nums[j+1]=temp;
+  }
+}
+
+选择排序: 
+for (int i=0;i<SIZE-1;i++){
+  int minIdx=i;
+  for(int j=i+1; j<SIZE;j++){
+    minIdx=(nums[j]<nums[minIdx])?J:minIdx;
+  }
+  temp=nums[i];
+  nums[i]=nums[minIdx];
+  nums[minIdx]=temp;
+}
+
+插入排序:
+for (int i=1;i<SIZE;i++){
+  temp=nums[i];
+  int j=i-1;
+  while (j>=0 && nums[j]>temp){
+      nums[j+1]=nums[j];
+      j--
+  }
+  nums[j+1]=temp;
+}
+
+ 
