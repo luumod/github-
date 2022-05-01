@@ -1,0 +1,74 @@
+今天刚结束链表的学习，做了两道链表的题目 ；
+
+
+第一题 :  删除链表中的某一个节点，但是不给你头节点，函数形参只有要删除的节点
+
+我们知道，要删除某一结点，可以定位到该节点的前驱节点，然后利用前驱结点指向该节点的后继节点，跳过要删除的节点，因此可以做到
+对于此链表的删除 ，借助头节点然后依次定位到某位置。 
+但是，对于不提供头节点该如何删除呢? 不提供头节点，因此不能找到要删除节点的前驱，因此无法使用前驱与后继跳过的方法
+
+对于本题 :  不提供前驱，那就从节点的后继入手，可以把要删除的节点赋值为与后继元素相同的节点，然后删除其后继节点，
+这样就间接的删除了这个节点，
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+void deleteNode(struct ListNode* node) {
+    struct ListNode* q;
+    
+    node->val=node->next->val;  //把该节点赋值为后继节点
+    
+    q=node->next;
+    node->next=q->next;     //删除后继节点，来实现删除此节点
+    free(q);
+}
+这实际上是一道脑筋急转弯，没必要执着于其本身，可以从事物的周围情况来看问题
+
+
+
+第二题 :
+
+删除链表中指定的倒数第几个节点
+输入：head = [1,2,3,4,5], n = 2
+输出：[1,2,3,5]
+
+有很多方法 
+最容易想到的就是既然要删除，那么我就找到他的前驱与后继就行
+链表给出了头节点，因此可以先计算链表的长度，根据长度与给定的n的大小，定位出前驱的位置
+
+注意，此题还要考虑一个情况，就是如果只有一个节点  :  [1] n=1 要删除1
+使用一个哑节点来控制头节点，这样就不需要考虑头节点的情况了
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+
+
+struct ListNode* removeNthFromEnd(struct ListNode* head, int n){
+    struct ListNode* p=head->next;
+    struct ListNode* cur=malloc(sizeof(struct ListNode)); //创建一个哑节点
+    cur->next=head;
+    cur->val=0;
+    struct ListNode* dummy=cur;
+    int count=0;
+    while (p){
+        count++;
+        p=p->next;
+    }   //计算链表长度，不包含头节点
+    for (int i=0;i<count-n+1;i++){
+        cur=cur->next;
+    }
+    cur->next=cur->next->next;
+    struct ListNode* ans=dummy->next; //指向头节点
+    free(dummy);    //释放哑节点
+    return ans;
+}
+
