@@ -1,0 +1,153 @@
+
+
+**********************************合并两个有序链表*********************************** :  
+1-2-3   2-4-9
+合并两个链表，然后按升序排序
+这道图很容易想到的是，把两个链表的元素值依次找出来，然后一个一个从小到大排序
+创捷一个新的头节点，然后存储排序好了之后的链表值
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     struct ListNode *next;
+ * };
+ */
+struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2){
+    struct ListNode* p=(struct ListNode*) malloc(sizeof(struct ListNode));
+    //创建一个新的节点，存储合并后排序的链表
+    p->next=NULL;
+    
+    //另一个节点用于返回
+    struct ListNode* q=p;   
+    while (list1!=NULL && list2!=NULL){
+    //链表节点从小到大，丛头开始寻找小的元素，一个一个的添加到链表中，同时注意原链表的增加
+        if (list1->val > list2->val){
+            p->next=list2;
+            list2=list2->next;
+        }
+        else{
+            p->next=list1;
+            list1=list1->next;
+        }
+        //节点递增
+        p=p->next;
+    }
+    //判断如果某一个节点是空
+    if (list1==NULL)
+        p->next=list2;
+    else if (list2==NULL)
+        p->next=list1;
+        //返回
+    return q->next;
+}
+
+
+****************************************判断是否是回文链表******************************
+链表 : 1-2-2-1  true        1-2-3   flase 
+
+思路 : 首先想到的是把链表的每一个节点的元素单独取出来，然后存储到一个数组里，最后判断数组元素是否是回文的即可
+
+bool isPalindrome(struct ListNode* head){
+    struct ListNode* p=head;
+    //struct ListNode* q=head;
+    int count=0;
+    while (p){
+        count++;
+        p=p->next;
+    }   //获得长度，
+    int num[count],a=0;
+    while (head){
+        num[a++]=head->val;
+        head=head->next;
+    }
+    //元素存储在数组里
+    for (int i=0,j=count-1;i<j;i++,j--){
+        if (num[i]!=num[j])
+            return false;
+    }
+    return true;
+}
+//首先可以先获取链表的长度，然后创建一个数组，依次存储元素到链表里，最后利用双指针判断两边是否相同即可
+
+*************************************合并两个有序数组**********************************
+输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+输出：[1,2,2,3,5,6]
+解释：需要合并 [1,2,3] 和 [2,5,6] 。
+合并结果是 [1,2,2,3,5,6] ，其中斜体加粗标注的为 nums1 中的元素。
+
+int comp(int* a,int* b){
+    if (*a==*b)
+        return 0;
+    else if (*a>*b)
+        return 1;
+    else
+        return -1;
+}
+void merge(int* nums1, int nums1Size, int m, int* nums2, int nums2Size, int n){
+    for(int i=0;i<n;i++){
+        nums1[m++]=nums2[i];        //题目说明把nums1的长度已经设定为m+n了，所以这题直接从第m个开始拷贝第二个数组的元素即可
+    }
+    qsort(nums1,nums1Size,sizeof(nums1[0]),comp);   //快速排序
+}
+//注意 : 如果题目没有说明nums1的长度是m+n，那么我觉得应该再来一个malloc(m+n)的新数组，然后根据下标赋值后，再排序，最后在memcpy
+复制给nums1即可，需要malloc动态分配  ，一开始我就是这么做的，发现我多余了
+
+
+************************************第一个错误的版本********************************
+简单来说 :  
+有一堆数字  F F F F  T  T  T  T   找出第一次出现 T 的位置
+// The API isBadVersion is defined for you.
+// bool isBadVersion(int version);
+函数检测为T还是F
+
+二分查找,折半查找 :
+int firstBadVersion(int n) {
+    int left=1,right=n;
+    while (left<right){
+        int middle=left+(right-left)/2;
+        if (isBadVersion(middle)){
+            //为true，说明要找的在其前面,更改右边界
+            right=middle;
+        }
+        else{
+            //为false,说明要找的在其右边，更改左边界
+            left=middle+1;
+        }
+    }
+    return left;
+}  
+
+简单举个例子 :   F  F  F   F   F   F   T  T   T   T    10个  当left < right
+1.        left=1    right=10    middle=l+(r-l)/2 =5  为F，缩小左边界  left=middle+1=6
+2.        left=6   right=10     middle=8  为 T ,缩小右边界    right=middle=8
+3.        left=6    right=8     middle=7  为 T，缩小右边界   right=middle=7
+4.        left=6    right=7     middle=6  为 F，缩小左边界   left=middle+1=7
+5.        left==right==7  退出循环    所要找的数字就是left的值，位置7
+
+还有个小例子，一个数组按大小排序，输入一个数字，找出这个数字所在的位置，不存在输出:no data
+折半查找这个数字:
+int main(void) {
+	int num;
+  //按升序排列，是一个数组，因此下标要从0和倒数第一个值开始
+	int ar[15] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+	int left = 0, right = 14, middle;
+	printf("输入一个数字:");
+	scanf("%d", &num);
+	while (left < right) {
+		middle = left + (right - left) / 2;
+		if (ar[middle] == num)
+    //查找到了这个值，直接退出
+			break;
+		else if (ar[middle] > num)
+    //中间的值大于num，缩短有边界
+			right = middle;
+		else if (ar[middle] < num)
+    //缩短左边界
+			left = middle + 1;
+	}
+	if (left < right)
+		printf("位置: %d\n", middle);
+	else
+		printf("no find\n");
+}
