@@ -1,0 +1,62 @@
+今日总结 
+复习了文件的输入和输出
+掌握了一下几个函数 :
+getc  putc  getchar  putchar    从文件读取字符
+scanf  fscanf  sscanf           从...地方读取数据
+fopen  fclose                   打开关闭文件
+printf  fprintf sprintf         把数据从...地方输出到...地方(stdout,文件)
+fwrite fread                    二进制 : 读取内容 写入文件
+ftell fseek rewind              确定文件的位置
+setvbuf fflush                  缓冲区的操作                        
+ferror feof exit strerror  stderr
+
+同时完成了结构体 链表的信息管理操作 :
+结构体输入信息 显示 
+排序: 1.可以用临时数组的方法，存储待排序的结构体成员到一个数组里，然后排序数组，最后根据数组的数据是否与结构体匹配输出
+	//号码排序完成
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			if (num[i] == p[j].number) {    //根据数据是否相等排序
+				printf("%s : %d\n", p[j].name, p[j].number);
+			}
+		}
+	}
+可以用作菜单的排序，只显示一次
+！！！！！！！！！！！！！注意此排序无法保存返回，因为没有修改结构体，只是普通排序输出！！！！！！！！！！！！！！！！！！！
+2. 利用 qsort函数排序(yyds)
+qsort(结构体名,结构体数组的大小,每个结构体的大小,比较函数);
+比较函数  : int comp(struct a,struct b){ return a.xxx > b.xxx}  升序  <降序
+修改结构体，可以返回主调函数
+
+链表 : 链表的操作
+初始化 输入 输出  计算  
+排序 : 链表的排序也可以用排序算法 ，但是要注意排序的是节点还是节点的值
+单纯的使用交换节点的值，会导致节点名不变，只改变值，这个问题很严重，尤其是在XXX信息管理中，名字不变，但是成绩却变了
+
+解决 : 临时创建一个节点用于存储，
+Node* p = NULL, * q = NULL;
+	p = head->next;
+	q = p->next;
+	Node* temp = head;	//存储临时信息
+	for (; p != NULL; p = p->next) {
+		for (q = p->next; q != NULL; q = q->next) {
+        //转移整个节点
+			if (p->number > q->number) {
+				//原内容移走
+				strcpy(temp->name, p->name);
+				temp->number = p->number;
+				//内容更新
+				strcpy(p->name, q->name);
+				p->number = q->number;
+				//转移
+				strcpy(q->name, temp->name);
+				q->number = temp->number;
+			}
+		}
+	}
+最后要记得返回这个临时节点，用它来当作已排序好的链表
+
+!!!!!!!!!!!!!链表是顺序的，因此无法进行二分查找!!!!!!!!!!!!!!!!!!!!!!
+
+
+
